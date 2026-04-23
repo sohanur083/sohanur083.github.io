@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="How transformers actually work: self-attention, multi-head, positional encoding, layer norm — and how they stack into a full LLM." />
+<title>How Transformers Work · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#05 · Transformer Deep-Dive</span>
+    <h1>How <span class="gradient-text">transformers</span> actually work</h1>
+    <p class="post-lead">
+      Every modern LLM — GPT, Claude, Llama, Gemini — is a transformer. The 2017 paper
+      <em>"Attention Is All You Need"</em> replaced recurrence with attention and changed the field.
+      Here's what's actually happening inside that stack.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>1. The one-slide version</h2>
+    <p>
+      A transformer is a <strong>stack of identical blocks</strong>. Each block has two sub-layers:
+      multi-head self-attention, and a feed-forward network. Residual connections and layer norm
+      wrap both. Input goes in as token embeddings, output comes out as contextualised embeddings.
+      Stack 12 of these → BERT. Stack 96 → GPT-3. Stack 80 with some tweaks → Llama 3.
+    </p>
+
+    <pre><code>Input tokens
+     ↓
+[ Embedding + Positional Encoding ]
+     ↓
+┌─────────────────────────────┐
+│  LayerNorm                  │
+│  Multi-Head Self-Attention  │
+│  + Residual                 │   × N blocks
+│  LayerNorm                  │
+│  Feed-Forward (MLP)         │
+│  + Residual                 │
+└─────────────────────────────┘
+     ↓
+[ Final LayerNorm + Output Projection ]
+     ↓
+Next-token probabilities</code></pre>
+
+    <h2>2. Self-attention in one equation</h2>
+    <p>
+      For every token, we produce three vectors: <strong>Query (Q)</strong>, <strong>Key (K)</strong>,
+      <strong>Value (V)</strong>. Each is just a learned linear projection of the token embedding.
+      Attention weights = how much each Query matches each Key:
+    </p>
+    <pre><code>Attention(Q, K, V) = softmax( Q · Kᵀ / √d_k ) · V</code></pre>
+    <p>
+      That's it. The <code>√d_k</code> is a scaling factor to keep gradients stable. Softmax turns
+      raw scores into a probability distribution over the sequence. Multiply by V and you get a
+      weighted sum of value vectors — the new representation for each token.
+    </p>
+    <p>
+      The magic: <em>every token sees every other token in one step</em>. RNNs had to unroll
+      sequentially. Attention is parallel. This is why transformers train so fast on GPUs.
+    </p>
+
+    <h2>3. Why <em>multi</em>-head?</h2>
+    <p>
+      One attention head can learn only one kind of relationship. Multiple heads run in parallel,
+      each with its own Q/K/V projections. Some heads learn syntactic patterns (previous word,
+      subject-verb), others learn semantic (coreference, entity linking), others learn long-range
+      dependencies. Their outputs are concatenated and mixed.
+    </p>
+    <p>
+      In GPT-3, each layer has <strong>96 attention heads</strong>. Below is a toy version with 4
+      heads — switch between them to see different patterns.
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">⌬ Multi-Head Attention Visualizer</span>
+        <span class="widget-note" id="head-name">Head 1 · Self-focus (diagonal)</span>
+      </div>
+      <canvas id="multihead-canvas" class="widget-canvas" style="background:transparent"></canvas>
+      <div class="widget-controls">
+        <label>select head
+          <select id="head-select">
+            <option value="0">Head 1 · Identity / self-focus</option>
+            <option value="1">Head 2 · Previous word</option>
+            <option value="2">Head 3 · Local window</option>
+            <option value="3">Head 4 · Long-range</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <p>
+      Different heads learn genuinely different skills. Analysing them is its own research area —
+      see Anthropic's circuits work, or Elhage et al. on <em>induction heads</em> that seem to
+      underlie in-context learning.
+    </p>
+
+    <h2>4. Positional encoding — how order gets in</h2>
+    <p>
+      Attention is <strong>order-invariant</strong>. Shuffle the tokens, output is identical. That's
+      fatal for language. Fix: add a position signal to each token embedding.
+    </p>
+    <ul>
+      <li><strong>Sinusoidal</strong> (original paper) — fixed sin/cos waves at different frequencies.</li>
+      <li><strong>Learned</strong> (BERT, early GPT) — a separate embedding per position, learned from data.</li>
+      <li><strong>RoPE</strong> (Llama, Qwen, most modern LLMs) — rotary position embeddings. Baked into Q and K themselves. Generalises better to longer sequences.</li>
+      <li><strong>ALiBi</strong> (BLOOM, MPT) — linear bias on attention scores based on distance. Extrapolates to unseen lengths.</li>
+    </ul>
+
+    <h2>5. Feed-forward block: where knowledge lives</h2>
+    <p>
+      After attention, each token goes through a 2-layer MLP <em>independently</em>. Usually 4× the
+      hidden dimension. It's huge: in GPT-3 the FFN accounts for <strong>~two-thirds of all
+      parameters</strong>.
+    </p>
+    <p>
+      Recent work (Geva et al.) argues the FFN layers act like a <em>key-value store of facts</em>.
+      When you ask GPT "the capital of France is ___", the attention routes the query to the right
+      FFN layer, which produces "Paris." Knowledge lives in the FFN. Attention just moves it around.
+    </p>
+
+    <h2>6. The full LLM: how it gets built</h2>
+    <ol>
+      <li><strong>Tokeniser</strong> — BPE/SentencePiece splits text into sub-word tokens. Vocab size 32k–256k.</li>
+      <li><strong>Embedding table</strong> — vocab × d_model. GPT-3: 50k × 12288 = 600M params just here.</li>
+      <li><strong>N transformer blocks</strong> — each ~12 × d_model² params. Llama-7B: 32 blocks, d_model=4096.</li>
+      <li><strong>Output head</strong> — linear projection back to vocab size. Often tied to embedding table to save params.</li>
+      <li><strong>Pre-training</strong> — next-token prediction on trillions of tokens of web text. Takes weeks on thousands of GPUs.</li>
+      <li><strong>Post-training</strong> — supervised fine-tuning (SFT) + RLHF / DPO on human preferences to make it helpful and safe.</li>
+    </ol>
+
+    <blockquote>
+      A 7B model has 7 billion parameters, each stored in fp16 (2 bytes). That's 14 GB just to
+      load. Training requires roughly 5× that for gradients + optimiser state. That's why
+      fine-tuning is expensive — and why we invented <a href="finetuning.html">LoRA / QLoRA</a>.
+    </blockquote>
+
+    <h2>7. Types of LLMs — not all transformers are equal</h2>
+    <h3>By architecture</h3>
+    <ul>
+      <li><strong>Encoder-only</strong> (BERT, RoBERTa) — bi-directional attention. Great for classification, embeddings, search. Can't generate.</li>
+      <li><strong>Decoder-only</strong> (GPT, Claude, Llama, Gemini) — causal / masked attention, each token only sees past tokens. Generates text. The dominant paradigm.</li>
+      <li><strong>Encoder-decoder</strong> (T5, BART, FLAN-T5) — encoder processes input fully, decoder generates output. Strong for translation, summarisation.</li>
+    </ul>
+
+    <h3>By training regime</h3>
+    <ul>
+      <li><strong>Base models</strong> — just next-token prediction. Raw, not conversational.</li>
+      <li><strong>Instruct models</strong> — base + supervised fine-tuning on instruction-response pairs. Follows commands.</li>
+      <li><strong>Chat models</strong> — instruct + RLHF/DPO. Polite, safe, conversational. ChatGPT, Claude.</li>
+      <li><strong>Reasoning models</strong> (o1, Claude thinking, DeepSeek-R1) — RL-tuned to generate explicit chain-of-thought before final answer. Slow but smart.</li>
+    </ul>
+
+    <h3>By scale + openness</h3>
+    <ul>
+      <li><strong>Frontier closed-source</strong> — GPT-4/5, Claude Opus, Gemini Ultra. 100B+ params (estimated). Proprietary APIs only.</li>
+      <li><strong>Open-weight</strong> — Llama 3, Qwen, Mistral, DeepSeek. 7B–405B. Weights published, run locally.</li>
+      <li><strong>Mixture-of-Experts (MoE)</strong> — DeepSeek-V3, Mixtral, GPT-4 (rumoured). Many "expert" FFN modules, only a few activate per token. Huge param count, cheap inference.</li>
+      <li><strong>Small/edge</strong> — Phi-3, Gemma 2B, TinyLlama. Cheap, run on laptops, good enough for many tasks.</li>
+    </ul>
+
+    <h2>8. What I actually care about</h2>
+    <p>
+      As a researcher on <a href="../index.html#research">trustworthy AI</a>, the part that
+      fascinates me is: all this beautiful math still confidently hallucinates. The attention
+      patterns look reasonable, the FFN stores facts, RLHF makes it polite — and yet when you ask
+      a medical LLM for a citation, half the time it makes one up. Understanding <em>why</em> is
+      the open problem. That's where <a href="xai.html">explainability</a> and <a href="llm.html">
+      hallucination research</a> come in.
+    </p>
+
+    <h2>Further reading</h2>
+    <ul>
+      <li>Vaswani et al., <em>Attention Is All You Need</em> (2017) — the original paper. Short, readable.</li>
+      <li>Jay Alammar, <em>The Illustrated Transformer</em> — still the best visual intro.</li>
+      <li>Anthropic, <em>A Mathematical Framework for Transformer Circuits</em> (2021).</li>
+      <li>Elhage et al., <em>In-context Learning and Induction Heads</em> (2022).</li>
+      <li>Karpathy's <em>nanoGPT</em> — full transformer in 300 lines of PyTorch. Read it.</li>
+    </ul>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="xai.html">
+      <span class="pn-label">← PREV</span>
+      <span class="pn-title">Opening the black box</span>
+    </a>
+    <a href="finetuning.html">
+      <span class="pn-label">NEXT →</span>
+      <span class="pn-title">Fine-tuning LLMs efficiently</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initMultiHead();</script>
+</body>
+</html>

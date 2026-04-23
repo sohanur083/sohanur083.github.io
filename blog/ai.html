@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="What is AI, really? From symbolic rules to neural nets — interactive perceptron demo." />
+<title>What is AI, really? · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#01 · AI Fundamentals</span>
+    <h1>What is AI, <span class="gradient-text">really</span>?</h1>
+    <p class="post-lead">
+      "Artificial intelligence" is thrown around like magic. Strip the marketing away and it's
+      one idea: <em>a machine that maps inputs to outputs using rules learned from data</em>.
+      Here's how we got from symbolic rules to ChatGPT — in 6 minutes.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>1. The symbolic era (1950s – 1980s)</h2>
+    <p>
+      Early AI was <strong>hand-written rules</strong>. You wanted a chess program? A human encoded
+      every opening, every strategy, every heuristic. If you wanted medical diagnosis? Same — a team
+      of doctors wrote thousands of <code>IF symptom THEN disease</code> rules (see MYCIN, 1972).
+    </p>
+    <p>
+      Works great for <strong>narrow, well-defined problems</strong>. Fails spectacularly the moment
+      reality is messy: handwriting, speech, translation, vision. The rules explode combinatorially.
+    </p>
+
+    <blockquote>
+      "Can a machine think?" — Alan Turing, 1950. Still the best question in the field.
+    </blockquote>
+
+    <h2>2. The statistical turn (1990s – 2010s)</h2>
+    <p>
+      Instead of humans writing rules, we give the machine <strong>data</strong> and let it
+      <em>fit a function</em>. Spam filter? Show it 10,000 spam emails + 10,000 ham emails. The
+      model learns which word-combinations signal spam. We stopped asking "what's the rule?" and
+      started asking "what does the data say?"
+    </p>
+    <p>
+      This is where you get <strong>logistic regression, SVMs, decision trees, random forests</strong>.
+      The core primitive most people still don't grok: the <strong>perceptron</strong>. One neuron.
+      A weighted sum of inputs plus a bias, squashed through a step. That's it.
+    </p>
+
+    <h3>Try it yourself</h3>
+    <p>
+      Two classes of points below. Drag the sliders to adjust weights <code>w₁</code>,
+      <code>w₂</code>, and bias <code>b</code>. The white line is the decision boundary. The
+      coloured regions are where the perceptron predicts each class. Goal: <em>100% accuracy</em>.
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">◈ Live Perceptron Demo</span>
+        <span class="widget-note">accuracy: <strong id="perceptron-acc" style="color:#5ff08d">0%</strong></span>
+      </div>
+      <canvas id="perceptron-canvas" class="widget-canvas"></canvas>
+      <div class="widget-controls">
+        <label>w₁ = <em id="w1-val">0.50</em>
+          <input type="range" id="w1" min="-2" max="2" step="0.05" value="0.5">
+        </label>
+        <label>w₂ = <em id="w2-val">-0.50</em>
+          <input type="range" id="w2" min="-2" max="2" step="0.05" value="-0.5">
+        </label>
+        <label>bias = <em id="bias-val">0.00</em>
+          <input type="range" id="bias" min="-2" max="2" step="0.05" value="0">
+        </label>
+        <button class="widget-btn" id="reset-perceptron">↺ Reset</button>
+      </div>
+    </div>
+
+    <p>
+      The perceptron's rule: if <code>w₁·x + w₂·y + b &gt; 0</code> → class A, else class B. That
+      single line of math is the entire core of <em>deep learning</em> — we just stack millions of
+      them together.
+    </p>
+
+    <h2>3. The deep learning explosion (2012 – now)</h2>
+    <p>
+      2012: AlexNet slaughtered the ImageNet competition using a <strong>convolutional neural
+      network</strong> and two GPUs. Everything changed. Stack enough perceptrons, train on enough
+      data, and you get:
+    </p>
+    <ul>
+      <li><strong>CNNs</strong> — see images (ImageNet, face recognition, medical imaging)</li>
+      <li><strong>RNNs / LSTMs</strong> — model sequences (translation, speech)</li>
+      <li><strong>Transformers</strong> — attend to context (GPT, BERT, Claude, Gemini)</li>
+    </ul>
+    <p>
+      The scary part: nobody <em>explicitly</em> taught GPT grammar. It learned it. Nobody
+      explicitly taught it reasoning. It emerges from predicting the next token over trillions of
+      words. That's both exhilarating and terrifying — which is why my research focuses on
+      <a href="llm.html">making sure these models don't confidently lie</a>.
+    </p>
+
+    <h2>4. What AI is not</h2>
+    <p>
+      AI is not magic. It's not sentient. It's not "understanding" in the human sense. It's a
+      statistical pattern matcher trained on human output. Powerful, genuinely useful, but
+      <strong>bounded by its training data</strong>. When you see a model confidently cite a fake
+      paper, that's not a bug — it's the system working exactly as designed: generating
+      <em>plausible</em> text, not <em>true</em> text.
+    </p>
+
+    <h2>5. Where to go next</h2>
+    <p>
+      The perceptron above is 2D. Real networks have <em>billions</em> of parameters across
+      <em>hundreds</em> of layers. Same idea, more scale. In the <a href="ml.html">next post</a> we
+      build up to "how does a model actually learn those weights?" — the magic trick is gradient
+      descent, and you can watch it happen live.
+    </p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="index.html">
+      <span class="pn-label">← BACK</span>
+      <span class="pn-title">All Posts</span>
+    </a>
+    <a href="ml.html">
+      <span class="pn-label">NEXT →</span>
+      <span class="pn-title">How models actually learn</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initPerceptron();</script>
+</body>
+</html>

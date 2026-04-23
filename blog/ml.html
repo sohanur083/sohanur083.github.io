@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="How machine learning models actually learn. Interactive linear regression demo with live gradient descent." />
+<title>How models actually learn · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#02 · Machine Learning</span>
+    <h1>How models <span class="gradient-text">actually learn</span></h1>
+    <p class="post-lead">
+      Every ML model, from linear regression to GPT-4, learns the same way: it makes a guess,
+      measures how wrong it was, and adjusts. Here's the trick in one interactive chart.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>The setup: supervised learning in one paragraph</h2>
+    <p>
+      You have inputs <code>x</code> and outputs <code>y</code>. You want a function <code>f(x) ≈
+      y</code>. ML says: pick a flexible function family (line, polynomial, neural net), define
+      how wrong it is (the <em>loss function</em>), and tune its parameters until the loss is small.
+      Done. That's all machine learning.
+    </p>
+
+    <h2>The simplest case: fitting a line</h2>
+    <p>
+      Given a cloud of points, find the line <code>y = m·x + b</code> that sits closest to them.
+      "Closest" typically means <strong>minimum mean squared error</strong> (MSE):
+      average of <code>(y_predicted - y_actual)²</code> across all points.
+    </p>
+    <p>
+      Click the canvas below to drop points. The line refits instantly using the closed-form
+      ordinary-least-squares solution. The dashed pink lines show the <em>residuals</em> — the errors
+      the line is trying to minimise.
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">◇ Live Linear Regression</span>
+        <span class="widget-note">
+          slope: <strong id="reg-slope" style="color:#7c5cff">0.000</strong> ·
+          intercept: <strong id="reg-intercept" style="color:#00d4ff">0.0</strong> ·
+          MSE: <strong id="reg-mse" style="color:#ff5cac">0.0</strong> ·
+          n = <strong id="reg-count">0</strong>
+        </span>
+      </div>
+      <canvas id="regression-canvas" class="widget-canvas"></canvas>
+      <div class="widget-controls">
+        <button class="widget-btn primary" id="demo-regression">✦ Generate demo data</button>
+        <button class="widget-btn" id="reset-regression">↺ Clear</button>
+      </div>
+    </div>
+
+    <h2>Why gradient descent beats closed-form</h2>
+    <p>
+      For a line you can solve it with algebra in one step. But once your function has millions of
+      parameters (neural nets), algebra gives up. Instead we use <strong>gradient descent</strong>:
+    </p>
+    <ol>
+      <li>Start with random weights.</li>
+      <li>Compute the loss.</li>
+      <li>Compute the <em>gradient</em> — which direction each weight should move to reduce the loss.</li>
+      <li>Take a small step in that direction. Repeat millions of times.</li>
+    </ol>
+    <p>
+      It's literally walking downhill on a loss surface. The "learning rate" is your step size —
+      too big and you overshoot, too small and it takes forever.
+    </p>
+
+    <blockquote>
+      Every model you've heard of — ResNet, BERT, GPT-4, Claude, Gemini — is just gradient descent
+      on a very large, very weird loss surface.
+    </blockquote>
+
+    <h2>The two enemies: bias and variance</h2>
+    <p>
+      Fit a straight line to curvy data → <strong>underfitting</strong> (high bias). The model is
+      too simple to capture the pattern.
+    </p>
+    <p>
+      Fit a 100-degree polynomial through 10 points → <strong>overfitting</strong> (high variance).
+      The model memorises noise instead of the signal. Hand it new data and it falls apart.
+    </p>
+    <p>
+      Everything in ML — regularisation, dropout, cross-validation, early stopping — is fighting
+      this trade-off. The goal: <em>generalise</em>, not memorise.
+    </p>
+
+    <h2>Core recipes you should know</h2>
+    <ul>
+      <li><strong>Linear / logistic regression</strong> — your baseline. Always fit one first.</li>
+      <li><strong>Gradient boosted trees</strong> (XGBoost, LightGBM) — still crushing tabular data in 2026.</li>
+      <li><strong>CNNs</strong> — images, spatial data.</li>
+      <li><strong>Transformers</strong> — text, code, protein folding, you name it.</li>
+      <li><strong>Contrastive learning</strong> — how modern embeddings get trained (CLIP, SimCLR).</li>
+    </ul>
+
+    <h2>What this has to do with my research</h2>
+    <p>
+      In LLM trustworthiness, we fight overfitting in a weird new way: the model doesn't overfit
+      its training data, but it <em>overfits the shape of plausible text</em>. Result: confident
+      hallucinations. In <a href="llm.html">the next post</a> I explain why, and what we're doing
+      about it at CAREAI Lab.
+    </p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="ai.html">
+      <span class="pn-label">← PREV</span>
+      <span class="pn-title">What is AI, really?</span>
+    </a>
+    <a href="llm.html">
+      <span class="pn-label">NEXT →</span>
+      <span class="pn-title">Inside an LLM</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initRegression();</script>
+</body>
+</html>

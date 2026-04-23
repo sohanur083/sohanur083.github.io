@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Md Sohanur Rahman — PhD CS Candidate at UTSA. Research on LLMs, hallucination mitigation, medical NLP, and Explainable AI." />
+<meta name="author" content="Md Sohanur Rahman" />
+<title>Md Sohanur Rahman · PhD Researcher in Trustworthy AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="blog/index.html">Blog</a></li>
+      <li><a href="#awards">Awards</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<header id="top" class="hero">
+  <div class="hero-grid"></div>
+  <div class="container hero-content">
+    <div class="hero-tag">
+      <span class="blink">●</span> AVAILABLE FOR RESEARCH / ML / SWE-ML INTERNSHIPS
+    </div>
+    <h1 class="hero-title">
+      <span class="line">Md Sohanur</span>
+      <span class="line gradient-text">Rahman</span>
+    </h1>
+    <p class="hero-subtitle">
+      <span id="typewriter"></span><span class="caret">|</span>
+    </p>
+    <p class="hero-desc">
+      PhD researcher building <strong>trustworthy AI</strong> — hallucination mitigation, medical NLP,
+      and explainable LLMs. Three years shipping production systems before academia.
+    </p>
+    <div class="hero-meta">
+      <span>UTSA</span>
+      <span class="dot">·</span>
+      <span>CAREAI Lab</span>
+      <span class="dot">·</span>
+      <span>Advisor: Dr. Ke Yang</span>
+      <span class="dot">·</span>
+      <span>CGPA 4.00</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#research" class="btn btn-primary">Explore Research →</a>
+      <a href="academic_cv - Md Sohanur Rahman.pdf" target="_blank" class="btn btn-ghost">Academic CV</a>
+      <a href="se_resume.pdf" target="_blank" class="btn btn-ghost">SWE Resume</a>
+    </div>
+    <div class="hero-socials">
+      <a href="mailto:mdsohanur.rahman@utsa.edu" aria-label="Email">✉ Email</a>
+      <a href="https://www.linkedin.com/in/sohan15" target="_blank" rel="noopener">⧉ LinkedIn</a>
+      <a href="https://github.com/sohanur083" target="_blank" rel="noopener">⌥ GitHub</a>
+      <a href="https://scholar.google.com/citations?user=hUdiIXoAAAAJ&hl=en" target="_blank" rel="noopener">⚴ Scholar</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</header>
+
+<section id="about" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p class="lead">
+          I'm a <strong>PhD candidate in Computer Science</strong> at UTSA, working at the intersection of
+          Large Language Models and healthcare. My research tackles one of AI's hardest open problems:
+          <em>how do we trust a model that confidently hallucinates?</em>
+        </p>
+        <p>
+          Before starting my PhD, I spent three years as a Software Engineer shipping 10+ production
+          Android apps and a Vue 3 platform serving 500K+ users. That engineering foundation shapes how
+          I approach research — I care about systems that actually work, not just benchmark wins.
+        </p>
+        <p>
+          Currently I explore <strong>multi-agent evaluation frameworks</strong>, <strong>causal rule
+          extraction</strong>, and <strong>explainable AI</strong> (Shapley, LIME) for clinical
+          question answering under Dr. Ke Yang at the CAREAI Lab.
+        </p>
+      </div>
+      <div class="about-sidebar">
+        <div class="fact-card">
+          <div class="fact-num">3+</div>
+          <div class="fact-label">Years as Software Engineer</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-num">2</div>
+          <div class="fact-label">Research Papers (1 published, 1 under review at AAAI 2026)</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-num">5,570</div>
+          <div class="fact-label">Benchmark questions open-sourced</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-num">400+</div>
+          <div class="fact-label">Competitive programming problems solved</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="interests">
+      <h3 class="mini-head">Research Interests</h3>
+      <div class="chip-row">
+        <span class="chip">LLM Trustworthiness</span>
+        <span class="chip">Hallucination Mitigation</span>
+        <span class="chip">Medical NLP</span>
+        <span class="chip">Explainable AI</span>
+        <span class="chip">Multi-Agent Systems</span>
+        <span class="chip">Prompt Engineering</span>
+        <span class="chip">RAG</span>
+        <span class="chip">Causal Reasoning</span>
+        <span class="chip">Human-AI Interaction</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="research" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Research</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="research-grid">
+      <!--
+        ADD NEW RESEARCH: copy the <article class="research-card">...</article> block below.
+        Edit: tag date, h3 title, venue, paragraph, stack tags. Paste above this comment.
+      -->
+      <article class="research-card">
+        <div class="research-tag">2024 – 2025 · CURRENT</div>
+        <h3>Multi-Agent Framework for Medical Summary Evaluation without Ground Truth</h3>
+        <p class="venue">AAAI 2026 · Under Review</p>
+        <p>
+          Decomposes quality assessment into <strong>usefulness, faithfulness, interpretability</strong>.
+          Uses LLMs as Summarizers and NLI Judges in a multi-agent setup. Benchmark dataset of 2,686
+          MCQA questions with annotated quality metrics, open-sourced.
+        </p>
+        <div class="research-stack">
+          <span>Multi-Agent</span><span>NLI</span><span>MCQA</span><span>LLM Eval</span>
+        </div>
+      </article>
+
+      <article class="research-card">
+        <div class="research-tag">2024 – 2025 · PUBLISHED</div>
+        <h3>Extracting Causal Relational Rules for Medical QA using LLMs</h3>
+        <p class="venue">IEEE GenAI4SCH · IEEE/ACM CHASE 2025</p>
+        <p>
+          Prompt-engineering framework that auto-extracts causal rules from medical QA. Released
+          2,884 questions with extracted rules built on Med-HALT. Pilot human eval confirmed strong
+          alignment with expert judgment.
+        </p>
+        <div class="research-stack">
+          <span>Prompt Engineering</span><span>Causal Reasoning</span><span>Med-HALT</span>
+        </div>
+      </article>
+
+      <article class="research-card">
+        <div class="research-tag">2019 – 2020 · THESIS</div>
+        <h3>Blockchain-Enabled E-Voting with Smart Contracts</h3>
+        <p class="venue">KUET Undergraduate Thesis</p>
+        <p>
+          Flexible blockchain architecture for electronic voting. Implemented custom hashing, national
+          ID + biometric verification for tamper-resistant records.
+        </p>
+        <div class="research-stack">
+          <span>Blockchain</span><span>Smart Contracts</span><span>Security</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="publications" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Publications & Talks</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="pub-list">
+      <!--
+        ADD NEW PUBLICATION: copy one <div class="pub">...</div> block.
+        Edit year, h4 title, authors, venue. Place newest on top.
+      -->
+      <div class="pub">
+        <div class="pub-year">2026</div>
+        <div class="pub-body">
+          <h4>A Multi-Agent Framework for Evaluating the Quality of Medical Summarization without Ground Truth</h4>
+          <p class="pub-authors"><strong>Md Sohanur Rahman</strong>, Anudeep Bonagiri, Shreyansh Rath, Anthony Rios, Ke Yang</p>
+          <p class="pub-venue">AAAI 2026 · <em>Under Review</em></p>
+        </div>
+      </div>
+
+      <div class="pub">
+        <div class="pub-year">2025</div>
+        <div class="pub-body">
+          <h4>Extracting Causal Relational Rules for Medical Question-Answering Tasks using Large Language Model</h4>
+          <p class="pub-authors"><strong>Md Sohanur Rahman</strong>, Yuexia Zhang, Anthony Rios, Ke Yang</p>
+          <p class="pub-venue">IEEE GenAI4SCH Workshop · IEEE/ACM CHASE 2025 <span class="pub-badge">Published</span></p>
+        </div>
+      </div>
+
+      <div class="pub">
+        <div class="pub-year">2025</div>
+        <div class="pub-body">
+          <h4>Oral Presentation · Short Paper No. 21</h4>
+          <p class="pub-authors">Workshop on Generative AI for Smart and Connected Health (GenAI4SCH)</p>
+          <p class="pub-venue">Co-located with IEEE/ACM CHASE 2025 <span class="pub-badge alt">Talk</span></p>
+        </div>
+      </div>
+
+      <div class="pub">
+        <div class="pub-year">2025</div>
+        <div class="pub-body">
+          <h4>Invited Talk — Web Content Summarization & Explanations · AI Agents Showcase</h4>
+          <p class="pub-authors">ACM San Antonio Chapter</p>
+          <p class="pub-venue">
+            <span class="pub-badge alt">Invited</span>
+            <a class="pub-link" href="https://colab.research.google.com/drive/1cd78sAT8z_txZH6opYCcENwcsjJlWr4J" target="_blank" rel="noopener">▶ Colab Notebook</a>
+            <a class="pub-link yt" href="https://www.youtube.com/watch?v=3R1-hF6TL5s" target="_blank" rel="noopener">▶ YouTube Talk</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Experience</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-date">Aug 2023 — Present</div>
+          <h3>Graduate Teaching & Research Assistant</h3>
+          <p class="tl-org">University of Texas at San Antonio · CAREAI Lab</p>
+          <ul>
+            <li>Research on hallucination mitigation in LLMs for medical QA systems.</li>
+            <li>Fine-tuned LLM to classify correct vs hallucinated answers — improved factual reliability.</li>
+            <li>Applied XAI (Shapley, LIME) to visualize token-level contributions.</li>
+            <li>First-author paper at IEEE GenAI4SCH on causal relation extraction.</li>
+            <li>Mentored students in Algorithms, System Design, Data Science.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-date">Feb 2023 — Jul 2023</div>
+          <h3>Frontend Developer (Part-time)</h3>
+          <p class="tl-org">BCS Prostuti Ltd · Dhaka, Bangladesh</p>
+          <ul>
+            <li>Led responsive frontend build for exam-prep platform using Vue 3.</li>
+            <li>Designed site skeleton, provided technical guidance to teammate.</li>
+            <li>Engineered live-exam module with real-time interaction and tracking.</li>
+            <li>Impact: 20K+ weekly web visitors, 500K+ app users.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-date">Mar 2020 — May 2023</div>
+          <h3>Software Engineer</h3>
+          <p class="tl-org">InterSpeed Digital Ltd · Dhaka, Bangladesh</p>
+          <ul>
+            <li>Built 10+ native Android apps: field worker monitoring, coffee roasting, sales pipeline, inventory.</li>
+            <li>Full lifecycle: data collection, real-time analytics, inventory, customer-facing UIs.</li>
+            <li>Data analysis on field ops — actionable insights for workforce efficiency.</li>
+            <li>Aligned tech strategy with business leadership for digital transformation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Skills</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">⌬</div>
+        <h3>Programming</h3>
+        <div class="skill-chips">
+          <span>Python</span><span>Java</span><span>Kotlin</span>
+          <span>C / C++</span><span>SQL</span><span>Bash</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">◈</div>
+        <h3>AI / ML</h3>
+        <div class="skill-chips">
+          <span>PyTorch</span><span>TensorFlow</span><span>Transformers</span>
+          <span>Scikit-learn</span><span>Hugging Face</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">✦</div>
+        <h3>LLMs</h3>
+        <div class="skill-chips">
+          <span>Prompt Engineering</span><span>LoRA / PEFT</span>
+          <span>RAG</span><span>XAI (Shapley / LIME)</span><span>Fine-tuning</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">▣</div>
+        <h3>Mobile & Web</h3>
+        <div class="skill-chips">
+          <span>Android SDK</span><span>Jetpack Compose</span><span>Firebase</span>
+          <span>Retrofit</span><span>Vue 3</span><span>REST APIs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="awards" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2>Awards</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="awards-grid">
+      <!-- ADD NEW AWARD: copy one <div class="award">...</div> block. -->
+      <div class="award"><span class="award-year">2025</span><p><strong>IEEE/ACM CHASE 2025 Travel Award</strong> — IEEE TCI, Connected Health excellence</p></div>
+      <div class="award"><span class="award-year">2020</span><p><strong>IEEE YESIST12 Maker Fair</strong> — Global Runner-up (Team KUET_FURY)</p></div>
+      <div class="award"><span class="award-year">2020</span><p><strong>KUET Vocational Scholarship</strong> — Academic performance</p></div>
+      <div class="award"><span class="award-year">2019</span><p><strong>NASA Space App Challenge</strong> — National Round, Top 40 of 4,000 teams</p></div>
+      <div class="award"><span class="award-year">2019</span><p><strong>IEEE YESIST12 Finale</strong> — Stamford Univ., Hua Hin, Thailand (Team KUET_NEURONS)</p></div>
+      <div class="award"><span class="award-year">2019</span><p><strong>University Day Project Competition</strong> — 1st Runner-up</p></div>
+      <div class="award"><span class="award-year">2019</span><p><strong>Entrepreneurship IT Innovation Contest</strong> — 1st Runner-up</p></div>
+      <div class="award"><span class="award-year">2019</span><p><strong>HackerRank Python Gold Badge</strong> — Profile: Sohan083</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="mentoring" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">07</span>
+      <h2>Mentoring & Leadership</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="mentor-grid">
+      <div class="mentor-card">
+        <div class="mentor-date">2025 — Present</div>
+        <h4>CARE-AI Lab</h4>
+        <p>Mentoring undergraduate researcher on AI safety and hallucination mitigation.</p>
+      </div>
+      <div class="mentor-card">
+        <div class="mentor-date">2018 — 2019</div>
+        <h4>HACK Club · KUET</h4>
+        <p>Led embedded systems workshops using Raspberry Pi and Arduino.</p>
+      </div>
+      <div class="mentor-card">
+        <div class="mentor-date">2016 — 2020</div>
+        <h4>SGIPC Programming Group</h4>
+        <p>Workshops on C & Python for algorithmic problem solving.</p>
+      </div>
+      <div class="mentor-card">
+        <div class="mentor-date">2019 — 2020</div>
+        <h4>Organizing Secretary · HACK</h4>
+        <p>Hardware Acceleration Club, KUET.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">08</span>
+      <h2>Get in Touch</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="contact-wrap">
+      <div class="contact-lead">
+        <h3>Let's build something <span class="gradient-text">trustworthy</span>.</h3>
+        <p>
+          Open to research internships, ML engineering roles, and collaborations on LLM reliability,
+          medical NLP, or multi-agent systems. Reach out — I reply fast.
+        </p>
+      </div>
+      <div class="contact-cards">
+        <a href="mailto:mdsohanur.rahman@utsa.edu" class="contact-card">
+          <div class="cc-label">Email</div>
+          <div class="cc-value">mdsohanur.rahman@utsa.edu</div>
+        </a>
+        <a href="tel:+17262216678" class="contact-card">
+          <div class="cc-label">Phone</div>
+          <div class="cc-value">+1 726 221 6678</div>
+        </a>
+        <a href="https://www.linkedin.com/in/sohan15" target="_blank" rel="noopener" class="contact-card">
+          <div class="cc-label">LinkedIn</div>
+          <div class="cc-value">linkedin.com/in/sohan15</div>
+        </a>
+        <a href="https://github.com/sohanur083" target="_blank" rel="noopener" class="contact-card">
+          <div class="cc-label">GitHub</div>
+          <div class="cc-value">github.com/sohanur083</div>
+        </a>
+        <a href="https://scholar.google.com/citations?user=hUdiIXoAAAAJ&hl=en" target="_blank" rel="noopener" class="contact-card">
+          <div class="cc-label">Google Scholar</div>
+          <div class="cc-value">scholar.google.com/...hUdiIXoAAAAJ</div>
+        </a>
+        <div class="contact-card">
+          <div class="cc-label">Location</div>
+          <div class="cc-value">San Antonio, Texas · USA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

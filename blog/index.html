@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Blog posts on AI, Machine Learning, Large Language Models, and Explainable AI by Md Sohanur Rahman." />
+<title>Blog · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<header class="blog-hero">
+  <div class="container">
+    <div class="hero-tag"><span class="blink">●</span> RESEARCH NOTES · INTERACTIVE</div>
+    <h1>Notes from my <span class="gradient-text">learning</span>.</h1>
+    <p class="blog-hero-sub">
+      Things I figured out while doing research — AI, ML, LLMs, transformers, fine-tuning,
+      explainability. Each post ships with a live interactive demo so you can <em>feel</em> the
+      concept, not just read about it.
+    </p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="post-grid">
+
+    <a href="ai.html" class="post-card post-ai">
+      <div class="post-meta">
+        <span class="post-tag">#01 · AI Fundamentals</span>
+        <span class="post-read">6 min · interactive</span>
+      </div>
+      <h2>What is AI, really?</h2>
+      <p>From symbolic rules to neural nets — a tour of how machines learned to "think," with a perceptron you can train in your browser.</p>
+      <div class="post-footer">
+        <span class="post-demo">◈ Live perceptron demo</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="ml.html" class="post-card post-ml">
+      <div class="post-meta">
+        <span class="post-tag">#02 · Machine Learning</span>
+        <span class="post-read">7 min · interactive</span>
+      </div>
+      <h2>How models actually learn</h2>
+      <p>Gradient descent in plain English. Click the canvas to drop points — watch a regression line fit them in real time.</p>
+      <div class="post-footer">
+        <span class="post-demo">◇ Live regression demo</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="llm.html" class="post-card post-llm">
+      <div class="post-meta">
+        <span class="post-tag">#03 · Large Language Models</span>
+        <span class="post-read">9 min · interactive</span>
+      </div>
+      <h2>Inside an LLM: tokens, attention, hallucinations</h2>
+      <p>Why your LLM confidently invents facts — and the three patterns we use to catch it. Includes a live tokenizer and attention heatmap.</p>
+      <div class="post-footer">
+        <span class="post-demo">✦ Tokenizer + attention demo</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="xai.html" class="post-card post-xai">
+      <div class="post-meta">
+        <span class="post-tag">#04 · Explainable AI</span>
+        <span class="post-read">8 min · interactive</span>
+      </div>
+      <h2>Opening the black box</h2>
+      <p>Shapley values, LIME, attention — three ways to ask a model "why?" Includes a live feature-importance visualizer.</p>
+      <div class="post-footer">
+        <span class="post-demo">▣ Shapley values demo</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="transformer.html" class="post-card post-transformer">
+      <div class="post-meta">
+        <span class="post-tag">#05 · Transformer Deep-Dive</span>
+        <span class="post-read">12 min · interactive</span>
+      </div>
+      <h2>How transformers actually work</h2>
+      <p>Self-attention, multi-head, positional encoding, layer norm — and how all of it stacks into a full LLM. Plus a live attention-head visualizer.</p>
+      <div class="post-footer">
+        <span class="post-demo">⌬ Multi-head attention demo</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="finetuning.html" class="post-card post-ft">
+      <div class="post-meta">
+        <span class="post-tag">#06 · Fine-Tuning</span>
+        <span class="post-read">10 min · interactive</span>
+      </div>
+      <h2>Fine-tuning LLMs efficiently</h2>
+      <p>Full fine-tune vs LoRA vs QLoRA vs PEFT vs DPO — when to use which, what breaks, and how to not blow your GPU budget. Live parameter-count calculator.</p>
+      <div class="post-footer">
+        <span class="post-demo">◉ Memory + param calculator</span>
+        <span class="post-arrow">→</span>
+      </div>
+    </a>
+
+  </section>
+
+  <section class="blog-cta">
+    <h3>Something you'd like me to write about?</h3>
+    <p>Drop me an email — I take requests.</p>
+    <a href="mailto:mdsohanur.rahman@utsa.edu" class="btn btn-primary">Say hi →</a>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>

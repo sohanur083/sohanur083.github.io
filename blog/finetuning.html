@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Fine-tuning LLMs: full FT vs LoRA vs QLoRA vs DPO. When to use which, how to save GPU memory, live parameter calculator." />
+<title>Fine-tuning LLMs · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#06 · Fine-Tuning</span>
+    <h1>Fine-tuning LLMs <span class="gradient-text">efficiently</span></h1>
+    <p class="post-lead">
+      A 70B model has 140 GB of weights. Full fine-tuning needs ~700 GB of VRAM. Most of us don't
+      have that. This is how we actually fine-tune large models without renting a cluster — and
+      when each method is worth the trade-off.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>What fine-tuning actually does</h2>
+    <p>
+      You take a pre-trained model (Llama, Mistral, Qwen) and continue training it on <em>your</em>
+      data for a narrower objective. The base model already understands language; you're teaching
+      it to follow your instructions, adopt your style, or know your domain.
+    </p>
+    <p>
+      Three modes you'll hear about:
+    </p>
+    <ol>
+      <li><strong>Continued pre-training</strong> — more next-token prediction on domain text (medical notes, legal contracts). Adjusts world knowledge.</li>
+      <li><strong>Supervised fine-tuning (SFT)</strong> — pairs of (prompt, desired response). Teaches format + task.</li>
+      <li><strong>Preference tuning</strong> (RLHF, DPO) — pairs of (chosen, rejected). Teaches taste + safety.</li>
+    </ol>
+
+    <h2>Full fine-tuning: the expensive baseline</h2>
+    <p>
+      Update <em>every</em> weight in the model. You need:
+    </p>
+    <ul>
+      <li><strong>Weights</strong> in fp16: 2 bytes × N params</li>
+      <li><strong>Gradients</strong>: same size as weights</li>
+      <li><strong>Adam optimiser state</strong>: 2 × fp32 copy = 8 bytes per param</li>
+      <li><strong>Activations</strong>: scales with batch size × sequence length</li>
+    </ul>
+    <p>
+      For a 7B model: 14 GB + 14 GB + 56 GB ≈ <strong>~84 GB minimum</strong>, plus activations.
+      One A100 80GB is tight. Full fine-tune of a 70B? You need 8× A100 with FSDP or DeepSpeed.
+    </p>
+    <p>
+      It works. It's also overkill for almost every use case. Your fine-tuning data is usually a
+      few thousand examples. You don't actually need to nudge all 7 billion parameters.
+    </p>
+
+    <h2>LoRA — the killer idea</h2>
+    <p>
+      Hu et al., 2021. Observation: the <em>update</em> to a big weight matrix during fine-tuning
+      is approximately <strong>low-rank</strong>. So don't learn the full update. Learn a rank-r
+      factorisation of it.
+    </p>
+    <pre><code>W_new = W_frozen + ΔW
+ΔW = A · B    where A is d×r, B is r×d,  r ≪ d</code></pre>
+    <p>
+      You freeze the original weights and only train A and B. For d=4096 and r=8, you go from
+      ~16M parameters per matrix down to ~65K. <strong>~0.1% of the original parameter count.</strong>
+    </p>
+    <ul>
+      <li>3–10× less VRAM</li>
+      <li>Trains 2–3× faster</li>
+      <li>Final quality: often within 1% of full fine-tune on instruction-tuning tasks</li>
+      <li>Adapter file is tiny (~50–200 MB) — ship it separately from the base model</li>
+    </ul>
+
+    <h2>QLoRA — push it even further</h2>
+    <p>
+      Dettmers et al., 2023. Add one trick to LoRA: <strong>quantise the frozen base model to
+      4-bit</strong> (NF4 format). You don't need fp16 precision on weights you're not updating.
+    </p>
+    <p>
+      Result: you can fine-tune a <strong>65B model on a single 48 GB GPU</strong>. The paper's
+      Guanaco model beat ChatGPT on the Vicuna benchmark, fine-tuned in 24 hours on one consumer
+      GPU.
+    </p>
+
+    <h2>Try it: the fine-tuning calculator</h2>
+    <p>
+      Pick a model size and method. The calculator estimates trainable parameters, memory
+      requirement, rough training time per epoch, and the cheapest GPU that fits.
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">◉ Fine-tuning Cost Calculator</span>
+        <span class="widget-note">rough estimates · batch=1, seq=2048</span>
+      </div>
+      <div class="widget-controls">
+        <label>model size
+          <select id="ft-size">
+            <option value="125M">125M (GPT-2 small)</option>
+            <option value="1B">1B (TinyLlama / Gemma 2B)</option>
+            <option value="7B" selected>7B (Llama 3 / Mistral)</option>
+            <option value="13B">13B (Llama 2 13B)</option>
+            <option value="70B">70B (Llama 3 70B)</option>
+          </select>
+        </label>
+        <label>method
+          <select id="ft-method">
+            <option value="full">Full fine-tune</option>
+            <option value="lora" selected>LoRA</option>
+            <option value="qlora">QLoRA (4-bit)</option>
+            <option value="ptuning">Prompt / P-tuning</option>
+          </select>
+        </label>
+        <label id="rank-wrap">LoRA rank (r)
+          <select id="ft-rank">
+            <option value="4">r = 4</option>
+            <option value="8" selected>r = 8</option>
+            <option value="16">r = 16</option>
+            <option value="32">r = 32</option>
+            <option value="64">r = 64</option>
+          </select>
+        </label>
+        <label id="bits-wrap">base precision
+          <select id="ft-bits">
+            <option value="16" selected>16-bit (fp16/bf16)</option>
+            <option value="8">8-bit</option>
+            <option value="4">4-bit (NF4 / QLoRA)</option>
+          </select>
+        </label>
+      </div>
+      <div class="calc-grid">
+        <div class="calc-cell">
+          <div class="cc-lbl">Trainable</div>
+          <div class="cc-val" id="ft-params" style="color:#7c5cff">—</div>
+        </div>
+        <div class="calc-cell">
+          <div class="cc-lbl">VRAM needed</div>
+          <div class="cc-val" id="ft-mem" style="color:#00d4ff">—</div>
+        </div>
+        <div class="calc-cell">
+          <div class="cc-lbl">Time / epoch</div>
+          <div class="cc-val" id="ft-time" style="color:#ffa84d">—</div>
+        </div>
+        <div class="calc-cell">
+          <div class="cc-lbl">GPU tier</div>
+          <div class="cc-val" id="ft-gpu" style="font-size:1.1rem">—</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>The full PEFT zoo</h2>
+    <p>
+      LoRA is the most popular but not the only approach. The Hugging Face <code>peft</code>
+      library ships them all:
+    </p>
+    <ul>
+      <li><strong>LoRA</strong> — low-rank adapter matrices. The default choice.</li>
+      <li><strong>QLoRA</strong> — LoRA + 4-bit quantised base. For huge models on one GPU.</li>
+      <li><strong>AdaLoRA</strong> — adaptively allocates rank per layer. Slight quality boost.</li>
+      <li><strong>LoRA-FA</strong> — freeze A, only train B. Half the adapter memory.</li>
+      <li><strong>Prefix tuning</strong> — prepend a small learned "virtual prompt" vector. Tiny params, weaker results.</li>
+      <li><strong>P-tuning / Prompt tuning</strong> — learn a soft prompt embedding only. Works for classification, struggles for generation.</li>
+      <li><strong>IA³</strong> — learn per-channel scaling factors for attention + FFN. Even fewer params than LoRA.</li>
+      <li><strong>DoRA</strong> — decomposes weights into magnitude + direction, only learns direction. Often beats LoRA at same rank.</li>
+    </ul>
+
+    <h2>Instruction tuning vs preference tuning</h2>
+    <h3>Supervised Fine-Tuning (SFT)</h3>
+    <p>
+      Dataset is pairs: (prompt, good_answer). Standard cross-entropy loss. Teaches the model what
+      format you want and what domain you care about. <strong>Start here.</strong> 1K–50K examples
+      goes a long way.
+    </p>
+
+    <h3>RLHF (Reinforcement Learning from Human Feedback)</h3>
+    <p>
+      Three stages: (1) SFT, (2) train a reward model on human preference pairs, (3) use PPO to
+      optimise the LLM against the reward model. Powerful, unstable, expensive. How ChatGPT was
+      built.
+    </p>
+
+    <h3>DPO (Direct Preference Optimization)</h3>
+    <p>
+      Rafailov et al., 2023. Skip the reward model. Optimise the LLM directly on preference pairs
+      with a clever closed-form loss. Same quality as RLHF, <em>way</em> simpler to run. This is
+      what most open-source projects use now (Zephyr, Mistral Instruct, Nous-Hermes).
+    </p>
+
+    <h3>ORPO / KTO / SimPO</h3>
+    <p>
+      Further simplifications of DPO. ORPO (Odds Ratio Preference Optimization) combines SFT and
+      preference tuning in one step. Worth trying if you're optimising training budget.
+    </p>
+
+    <h2>Best-practice checklist (my personal one)</h2>
+    <ol>
+      <li><strong>Do you actually need to fine-tune?</strong> Try prompt engineering + few-shot first. Then RAG. Fine-tune only if those plateau.</li>
+      <li><strong>Data quality &gt; data quantity.</strong> 1K clean examples beat 100K noisy ones. Always.</li>
+      <li><strong>Default to QLoRA.</strong> Unless you have a good reason for full FT. r=16, alpha=32, dropout=0.05 is a solid starting point.</li>
+      <li><strong>Target modules matter.</strong> For Llama, apply LoRA to <code>q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj</code> — all the projections, not just attention.</li>
+      <li><strong>Eval before you ship.</strong> Hold out a test set. Compare against the base model. If fine-tuning made it worse on anything, figure out why.</li>
+      <li><strong>Stop early.</strong> Most fine-tunes overfit after 2–3 epochs on small datasets. Use validation loss, not train loss.</li>
+      <li><strong>Save adapters, not merged weights</strong> — until you're ready to deploy. Adapters are tiny, composable, and you can try many.</li>
+    </ol>
+
+    <blockquote>
+      "The 3AM version of this project" test: can you re-run your fine-tune from scratch at 3AM
+      after waking up confused? If yes, your config is right. If it's a fragile stack of custom
+      scripts, refactor.
+    </blockquote>
+
+    <h2>Tools you'll actually use</h2>
+    <ul>
+      <li><strong>Hugging Face <code>transformers</code> + <code>peft</code> + <code>trl</code></strong> — the standard stack</li>
+      <li><strong>Axolotl</strong> — YAML-driven fine-tuning framework, handles all the boilerplate</li>
+      <li><strong>Unsloth</strong> — optimised kernels, 2× faster LoRA fine-tuning on consumer GPUs</li>
+      <li><strong>LLaMA-Factory</strong> — GUI + CLI for fine-tuning, good for non-coders</li>
+      <li><strong>Weights &amp; Biases / MLflow</strong> — always log your runs. Always.</li>
+    </ul>
+
+    <h2>Mistakes I've watched people make</h2>
+    <ul>
+      <li>Fine-tuning a chat model on plain text completions → broke the chat template. Always keep the instruction format consistent.</li>
+      <li>Using learning rate 5e-5 (standard for BERT) on a Llama-LoRA. Too low. LoRA typically wants 1e-4 to 3e-4.</li>
+      <li>Mixing fp16 optimiser states on bf16 trained models. Use bf16 end-to-end on Ampere+ GPUs.</li>
+      <li>Fine-tuning on their test set by accident. <em>Always</em> split by source, not row.</li>
+    </ul>
+
+    <h2>Bottom line</h2>
+    <p>
+      In 2026, fine-tuning is <strong>mostly solved</strong> at the small scale. QLoRA on a single
+      A100 will get you 95% of the way for most tasks. The hard part is no longer compute — it's
+      <em>data curation, evaluation, and deployment</em>. Spend your time there.
+    </p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="transformer.html">
+      <span class="pn-label">← PREV</span>
+      <span class="pn-title">How Transformers Work</span>
+    </a>
+    <a href="index.html">
+      <span class="pn-label">BACK →</span>
+      <span class="pn-title">All Posts</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initFTCalc();</script>
+</body>
+</html>

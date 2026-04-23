@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Inside an LLM: tokens, attention, and hallucinations. Interactive tokenizer and attention heatmap demos." />
+<title>Inside an LLM · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#03 · Large Language Models</span>
+    <h1>Inside an <span class="gradient-text">LLM</span>: tokens, attention, hallucinations</h1>
+    <p class="post-lead">
+      An LLM doesn't read words. It reads <em>tokens</em>, moves them through <em>attention</em>,
+      and predicts the next token. That's it. Everything else — reasoning, creativity, and yes,
+      hallucination — is emergent from this loop.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>1. Words aren't atomic — tokens are</h2>
+    <p>
+      Before an LLM sees your prompt, it's chopped into <strong>tokens</strong>: sub-word units. A
+      common word like <code>cat</code> is one token. A rare word like <code>hallucination</code>
+      might split into <code>halluc</code> + <code>##ination</code>. Byte-Pair Encoding (BPE) and
+      WordPiece are the two dominant schemes.
+    </p>
+    <p>Type anything below — watch how it splits:</p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">✦ Live Tokenizer (simulated BPE)</span>
+        <span class="widget-note">tokens: <strong id="token-count" style="color:#5ff08d">0</strong></span>
+      </div>
+      <div class="widget-controls">
+        <label style="flex: 1; min-width: 100%;">input text
+          <textarea id="tokenize-input" rows="3">The doctor carefully examined the patient's hallucinations.</textarea>
+        </label>
+      </div>
+      <div id="tokenize-output" class="tokens"></div>
+    </div>
+
+    <p>
+      Why it matters: GPT-4 costs per token. A 2,000-word prompt is ~3,000 tokens, not 2,000.
+      Non-English languages often tokenise worse (more tokens per concept), which is why
+      multilingual prompts burn context faster.
+    </p>
+
+    <h2>2. Attention: how context becomes meaning</h2>
+    <p>
+      Every token asks: <em>"which other tokens in the context should I listen to?"</em> That
+      weight matrix — who attends to whom, how much — is the <strong>attention mechanism</strong>
+      (Vaswani et al., 2017). In "The doctor said the patient needs rest," the word
+      <code>patient</code> attends strongly to <code>doctor</code>, because their relationship
+      carries meaning.
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">✦ Attention Heatmap (toy example)</span>
+        <span class="widget-note">row = query, col = key · darker = more attention</span>
+      </div>
+      <canvas id="attention-canvas" class="widget-canvas" style="background:transparent"></canvas>
+      <p style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); margin-top: 14px;">
+        Notice how <strong style="color:var(--accent-2)">patient</strong> attends heavily to
+        <strong style="color:var(--accent-2)">doctor</strong> and <strong style="color:var(--accent-2)">needs</strong>
+        — the model binds the entity to its relevant context.
+      </p>
+    </div>
+
+    <p>
+      Transformers stack <em>many</em> attention heads in <em>many</em> layers. Each head learns a
+      different kind of dependency: coreference, syntax, topic, sentiment, and things we still can't
+      name. That's why interpretability research (my work!) is hard.
+    </p>
+
+    <h2>3. Why LLMs hallucinate</h2>
+    <p>
+      LLMs are trained to maximise the probability of the next token given prior tokens. They are
+      <strong>not</strong> trained to check whether their output is true. As a result:
+    </p>
+    <ul>
+      <li><strong>Intrinsic hallucination</strong> — output contradicts the input prompt.</li>
+      <li><strong>Extrinsic hallucination</strong> — output contradicts world knowledge.</li>
+      <li><strong>Confabulation</strong> — model invents plausible-but-fake citations, names, URLs.</li>
+    </ul>
+    <p>
+      In healthcare, where I work, this is dangerous. Our <a href="../index.html#research">
+      GenAI4SCH paper</a> built a prompt-engineering framework that extracts <em>causal relational
+      rules</em> from LLM outputs in medical QA — giving us something concrete to verify the model
+      against, rather than trusting free-form generation.
+    </p>
+
+    <h2>4. Three patterns that reduce hallucination</h2>
+    <h3>a) Retrieval-Augmented Generation (RAG)</h3>
+    <p>
+      Ground the model in a trusted knowledge base. Retrieve relevant documents first, stuff them
+      into the prompt, then generate. The model now has <em>evidence</em> to cite instead of
+      hallucinating.
+    </p>
+
+    <h3>b) Chain-of-verification / NLI judges</h3>
+    <p>
+      After generating, a second model (or the same model, second pass) checks: <em>does this
+      statement logically follow from the source?</em> This is the core of our AAAI 2026
+      submission — using Natural Language Inference (NLI) judges to score summary faithfulness
+      without ground truth.
+    </p>
+
+    <h3>c) Fine-tuning with preference data (RLHF/DPO)</h3>
+    <p>
+      Collect pairs of (chosen, rejected) outputs and train the model to prefer the chosen ones.
+      This is how ChatGPT got polite, and how Constitutional AI makes Claude cautious. Still
+      doesn't eliminate hallucination — just reduces it.
+    </p>
+
+    <h2>5. What you should take away</h2>
+    <ul>
+      <li>LLMs are next-token predictors. Brilliant at plausibility, indifferent to truth.</li>
+      <li>Attention is why they feel context-aware — but each head is a black box.</li>
+      <li>For high-stakes domains (medicine, law, finance): <strong>never deploy raw LLM output</strong>. Always add retrieval, verification, or human review.</li>
+    </ul>
+    <p>
+      In <a href="xai.html">the next post</a> we crack open the black box with Shapley values, LIME,
+      and attention analysis — the three workhorses of explainable AI.
+    </p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="ml.html">
+      <span class="pn-label">← PREV</span>
+      <span class="pn-title">How models actually learn</span>
+    </a>
+    <a href="xai.html">
+      <span class="pn-label">NEXT →</span>
+      <span class="pn-title">Opening the black box</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initTokenizer(); initAttention();</script>
+</body>
+</html>

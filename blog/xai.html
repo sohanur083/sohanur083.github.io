@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Explainable AI: Shapley values, LIME, and attention. Interactive feature importance demo." />
+<title>Opening the black box · Md Sohanur Rahman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="css/blog.css" />
+</head>
+<body>
+
+<canvas id="neural-bg"></canvas>
+
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-bracket">&lt;</span>
+      <span class="logo-name">sohan</span>
+      <span class="logo-bracket">/&gt;</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#research">Research</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="index.html" style="color:var(--text)">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<article class="post container">
+
+  <header class="post-header">
+    <div class="post-breadcrumb">
+      <a href="index.html">← All posts</a>
+    </div>
+    <span class="post-tag">#04 · Explainable AI</span>
+    <h1>Opening the <span class="gradient-text">black box</span></h1>
+    <p class="post-lead">
+      A model that says "this patient is high-risk" is useless to a doctor who can't tell
+      <em>why</em>. Explainable AI (XAI) is the set of tools that make models account for their
+      decisions — the core of trustworthy AI.
+    </p>
+  </header>
+
+  <div class="post-body">
+
+    <h2>Why XAI matters (especially in medicine)</h2>
+    <p>
+      Regulation requires it: the EU AI Act and FDA guidelines on medical AI both demand
+      <strong>human-understandable explanations</strong>. Ethics demands it: you cannot dispute a
+      diagnosis you can't understand. And science demands it: if we can't explain why a model
+      works, we can't trust it on new data.
+    </p>
+    <p>
+      In my lab, when we build LLMs for medical question answering, we pair every prediction with
+      a token-level explanation using Shapley values and LIME. Below is a simplified risk model you
+      can probe yourself.
+    </p>
+
+    <h2>Live demo: feature contributions to a risk score</h2>
+    <p>
+      Imagine a cardiovascular-risk model. Drag the sliders. The bars show each feature's
+      <strong>Shapley-style contribution</strong> — how much it pushes the prediction above or below
+      the baseline. Green bars push the risk down, pink bars push it up. The ordering updates live
+      (most-influential first).
+    </p>
+
+    <div class="widget">
+      <div class="widget-head">
+        <span class="widget-title">▣ Feature Importance · Cardiovascular Risk</span>
+        <span class="widget-note">predicted risk: <strong id="risk-score" style="color:#ffa84d">40%</strong></span>
+      </div>
+      <div id="shapley-sliders" class="widget-controls" style="gap:18px"></div>
+      <div id="shapley-bars" class="bar-chart" style="margin-top:24px"></div>
+    </div>
+
+    <p>
+      Try it: crank <code>smoker</code> to 1 and watch the risk jump. Drop <code>BMI</code> to 20
+      and watch it relax. This is the exact pattern a clinician scans in SHAP waterfall plots every
+      day.
+    </p>
+
+    <h2>The three XAI workhorses</h2>
+
+    <h3>1. SHAP (SHapley Additive exPlanations)</h3>
+    <p>
+      Borrowed from game theory (Shapley, 1953). For each feature, compute its average marginal
+      contribution across <em>all possible orderings</em> of the features. Result: a number that
+      says "this feature added +0.23 to the prediction." Mathematically principled, slow to compute
+      exactly, but well-approximated.
+    </p>
+    <p>
+      We use <code>shap.Explainer</code> on our medical LLMs to identify which tokens in the
+      question / context pushed the model toward its answer.
+    </p>
+
+    <h3>2. LIME (Local Interpretable Model-agnostic Explanations)</h3>
+    <p>
+      For a single prediction, LIME builds a <em>simple linear model</em> (logistic regression,
+      typically) that mimics the black-box model's behaviour <em>in the neighbourhood</em> of that
+      prediction. The coefficients of the linear model are your explanation.
+    </p>
+    <p>
+      Cheaper than SHAP. Less principled, more hackable. Works on any model — even a model you
+      only have API access to.
+    </p>
+
+    <h3>3. Attention analysis</h3>
+    <p>
+      For transformer models, inspect the attention weights directly (we did this in the
+      <a href="llm.html">LLM post</a>). Caveat: <em>attention is not explanation</em> (Jain &amp;
+      Wallace, 2019). High attention doesn't mean high causal importance. Use it as a
+      <strong>hint</strong>, not a proof.
+    </p>
+
+    <blockquote>
+      "Attention is not explanation. But it is a hypothesis generator." — I quote this line in
+      every talk I give.
+    </blockquote>
+
+    <h2>Local vs global explanations</h2>
+    <p>
+      <strong>Local</strong>: why did the model predict <em>this</em> outcome for <em>this</em>
+      patient? (SHAP, LIME, counterfactuals.)
+    </p>
+    <p>
+      <strong>Global</strong>: what does the model learn in general? (Feature importance across the
+      test set, decision tree surrogates, concept activation vectors.)
+    </p>
+    <p>
+      In medicine we need both. Local explanations justify one prediction to a clinician. Global
+      explanations let regulators audit the model's behaviour.
+    </p>
+
+    <h2>The honest limits of XAI</h2>
+    <ul>
+      <li><strong>Explanations can lie.</strong> SHAP explains the model, not reality. If the model learned a spurious correlation (e.g. "pneumonia patients recover faster" because the sickest get admitted to ICU faster), SHAP will faithfully explain the <em>spurious</em> pattern.</li>
+      <li><strong>Humans over-trust explanations.</strong> Showing any explanation, even a bad one, raises user trust more than it should (Bansal et al., 2021).</li>
+      <li><strong>No method works for all models.</strong> SHAP is brittle for RNNs, LIME is noisy for high-dimensional inputs, attention-based methods don't apply to non-transformers.</li>
+    </ul>
+
+    <h2>Where the field is going</h2>
+    <p>
+      My own bet: <strong>structured, verifiable explanations</strong>. Instead of "here are 10
+      important tokens," make the model output a causal rule, a citation, a logical proof. Something
+      that can be <em>checked by a second system</em>. That's the direction of our work on causal
+      relational rules for medical QA, and the multi-agent evaluation framework under review at
+      AAAI 2026.
+    </p>
+    <p>
+      AI that explains itself is good. AI that explains itself <em>in a way another AI (or human)
+      can verify</em> is the real goal. That's trustworthy AI.
+    </p>
+
+    <h2>Further reading</h2>
+    <ul>
+      <li>Lundberg &amp; Lee, <em>A Unified Approach to Interpreting Model Predictions</em> (2017) — the SHAP paper</li>
+      <li>Ribeiro et al., <em>"Why Should I Trust You?"</em> (2016) — the LIME paper</li>
+      <li>Jain &amp; Wallace, <em>Attention is not Explanation</em> (2019)</li>
+      <li>Molnar, <em>Interpretable Machine Learning</em> — free book, best single resource</li>
+    </ul>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="llm.html">
+      <span class="pn-label">← PREV</span>
+      <span class="pn-title">Inside an LLM</span>
+    </a>
+    <a href="transformer.html">
+      <span class="pn-label">NEXT →</span>
+      <span class="pn-title">How Transformers Work</span>
+    </a>
+  </div>
+
+</article>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span class="footer-logo">&lt;sohan/&gt;</span>
+      <p>Built with vanilla HTML, CSS, JS · Hosted on GitHub Pages</p>
+    </div>
+    <div class="footer-meta">
+      <span>© <span id="year"></span> Md Sohanur Rahman</span>
+      <span class="dot">·</span>
+      <span>San Antonio, TX</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="js/widgets.js"></script>
+<script>initShapley();</script>
+</body>
+</html>
