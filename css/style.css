@@ -502,6 +502,94 @@ img { max-width: 100%; display: block; }
   color: var(--text-muted);
 }
 
+/* PROJECTS */
+.section-lead {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+.section-lead strong { color: var(--text); font-weight: 600; }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.project-card {
+  display: block;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all .3s ease;
+  color: inherit;
+}
+.project-card::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .4s ease;
+}
+.project-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-strong);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  color: inherit;
+}
+.project-card:hover::before { transform: scaleX(1); }
+
+.project-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.project-card h3 {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+.project-card p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.project-stack {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 18px;
+}
+.project-stack span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.project-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-2);
+  word-break: break-all;
+  gap: 10px;
+}
+.project-footer .arrow { font-size: 1.1rem; transition: transform .3s ease; flex-shrink: 0; }
+.project-card:hover .project-footer .arrow { transform: translateX(5px); }
+
 /* PUBLICATIONS */
 .pub-list { display: flex; flex-direction: column; gap: 2px; }
 .pub {
